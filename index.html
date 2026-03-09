@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruitment Assessment System</title>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .section { display: none; }
+        .active { display: block; }
+        h2 { color: #2c3e50; }
+        .question { margin-bottom: 20px; padding: 15px; border-bottom: 1px solid #eee; }
+        button { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="setup" class="section active">
+        <h2>แบบทดสอบผู้สมัครงาน</h2>
+        <p>กรุณากรอกข้อมูลเพื่อเริ่มทำแบบทดสอบ (English, DISC, IQ)</p>
+        <input type="text" id="userName" placeholder="ชื่อ-นามสกุล" style="width:100%; padding:10px; margin-bottom:20px;">
+        <button onclick="startTest()">เริ่มทำแบบทดสอบ</button>
+    </div>
+
+    <div id="quiz-container" class="section">
+        <h2 id="quiz-title"></h2>
+        <div id="questions"></div>
+        <button onclick="nextSection()">ถัดไป</button>
+    </div>
+
+    <div id="result" class="section">
+        <h2>ส่งคำตอบเรียบร้อยแล้ว</h2>
+        <p id="summaryText"></p>
+        <p>ข้อมูลของคุณถูกบันทึกเข้าระบบแล้ว ขอบคุณครับ</p>
+    </div>
+</div>
+
+<script>
+    let currentStep = 0;
+    let answers = { name: "", englishScore: 0, discResult: "", iqScore: 0 };
+
+    const questionsData = [
+        {
+            title: "1. English Test (เลือกข้อที่ถูก)",
+            type: "score",
+            items: [
+                { q: "I ___ to the market yesterday.", a: ["go", "went", "gone"], correct: 1 },
+                { q: "She ___ a doctor.", a: ["is", "am", "are"], correct: 0 }
+            ]
+        },
+        {
+            title: "2. DISC Analysis (เลือกที่ตรงกับคุณที่สุด)",
+            type: "disc",
+            items: [
+                { q: "เมื่อทำงานในทีม คุณมักจะเป็นคน...", a: ["ตัดสินใจเด็ดขาด (D)", "สร้างบรรยากาศสนุกสนาน (I)", "รับฟังและสนับสนุน (S)", "เน้นรายละเอียดความถูกต้อง (C)"], val: ["D", "I", "S", "C"] }
+            ]
+        }
+    ];
+
+    function startTest() {
+        answers.name = document.getElementById('userName').value;
+        if(!answers.name) return alert("กรุณากรอกชื่อ");
+        document.getElementById('setup').classList.remove('active');
+        document.getElementById('quiz-container').classList.add('active');
+        showQuestions();
+    }
+
+    function showQuestions() {
+        const data = questionsData[currentStep];
+        document.getElementById('quiz-title').innerText = data.title;
+        let html = '';
+        data.items.forEach((item, idx) => {
+            html += `<div class="question"><p>${item.q}</p>`;
+            item.a.forEach((opt, i) => {
+                html += `<label><input type="radio" name="q${idx}" value="${i}"> ${opt}</label><br>`;
+            });
+            html += `</div>`;
+        });
+        document.getElementById('questions').innerHTML = html;
+    }
+
+    function nextSection() {
+        // Logic การเก็บคะแนน (ตัวอย่างคร่าวๆ)
+        if(currentStep < questionsData.length - 1) {
+            currentStep++;
+            showQuestions();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz-container').classList.remove('active');
+        document.getElementById('result').classList.add('active');
+        document.getElementById('summaryText').innerText = `คุณ ${answers.name} ทำแบบทดสอบเสร็จสิ้น`;
+        
+        // ตรงนี้คือจุดที่จะใส่โค้ด fetch() เพื่อส่งข้อมูลไป Google Sheets ในอนาคต
+        console.log("Final Answers:", answers);
+    }
+</script>
+
+</body>
+</html>
