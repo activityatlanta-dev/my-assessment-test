@@ -1,0 +1,36 @@
+name: Email Notifications Cron
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+    - cron: '0 9 1,4,7,10,13,16,19,22,25,28,31 * *'
+
+jobs:
+  send-reminder-emails:
+    if: github.event.schedule == '0 9 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger send-reminder-emails
+        run: |
+          curl -X POST https://xjncxnidzrsrixbbzidl.supabase.co/functions/v1/send-reminder-emails \
+            -H "Content-Type: application/json" \
+            -d '{}'
+
+  send-escalation-emails:
+    if: github.event.schedule == '0 9 1,4,7,10,13,16,19,22,25,28,31 * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger send-escalation-emails
+        run: |
+          curl -X POST https://xjncxnidzrsrixbbzidl.supabase.co/functions/v1/send-escalation-emails \
+            -H "Content-Type: application/json" \
+            -d '{}'
+
+  process-email-queue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger send-emails
+        run: |
+          curl -X POST https://xjncxnidzrsrixbbzidl.supabase.co/functions/v1/send-emails \
+            -H "Content-Type: application/json" \
+            -d '{}'
